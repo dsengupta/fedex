@@ -174,14 +174,7 @@ module Fedex
                 xml.Units package[:dimensions][:units]
               }
             end
-            if package[:customer_refrences]
-              xml.CustomerReferences{
-              package[:customer_refrences].each do |value|
-                 xml.CustomerReferenceType 'CUSTOMER_REFERENCE'
-                 xml.Value                 value
-              end
-              }
-            end
+            add_customer_references(xml, package)
             if package[:special_services_requested] && package[:special_services_requested][:special_service_types]
               xml.SpecialServicesRequested{
                 if package[:special_services_requested][:special_service_types].is_a? Array
@@ -231,6 +224,29 @@ module Fedex
         end
       end
 
+      def add_customer_references(xml, package)
+        # customer_refrences is a legacy misspelling
+        if refs = package[:customer_references] || package[:customer_refrences]
+          refs.each do |ref|
+            xml.CustomerReferences{
+              if ref.is_a?(Hash)
+                # :type can specify custom type:
+                #
+                # BILL_OF_LADING, CUSTOMER_REFERENCE, DEPARTMENT_NUMBER,
+                # ELECTRONIC_PRODUCT_CODE, INTRACOUNTRY_REGULATORY_REFERENCE,
+                # INVOICE_NUMBER, P_O_NUMBER, RMA_ASSOCIATION,
+                # SHIPMENT_INTEGRITY, STORE_NUMBER
+                xml.CustomerReferenceType ref[:type]
+                xml.Value                 ref[:value]
+              else
+                xml.CustomerReferenceType 'CUSTOMER_REFERENCE'
+                xml.Value                 ref
+              end
+            }
+          end
+        end
+      end
+
       # Add customs clearance(for international shipments)
       def add_customs_clearance(xml)
         xml.CustomsClearanceDetail{
@@ -261,8 +277,8 @@ module Fedex
             value.each do |v|
               xml.send element do |x|
                 hash_to_xml(x, v)
-              end  
-            end  
+              end
+            end
           else
             xml.send element, value
           end

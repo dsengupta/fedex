@@ -175,7 +175,7 @@ module Fedex
               }
             end
             add_customer_references(xml, package)
-            if package[:special_services_requested] && package[:special_services_requested][:special_service_types]
+            if package[:special_services_requested]
               xml.SpecialServicesRequested{
                 if package[:special_services_requested][:special_service_types].is_a? Array
                   package[:special_services_requested][:special_service_types].each do |type|
@@ -183,7 +183,7 @@ module Fedex
                   end
                 else
                   xml.SpecialServiceTypes package[:special_services_requested][:special_service_types]
-                end
+                end if package[:special_services_requested][:special_service_types]
                 # Handle COD Options
                 if package[:special_services_requested][:cod_detail]
                   xml.CodDetail{

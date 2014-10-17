@@ -43,6 +43,7 @@ module Fedex
       @signature_name         = details[:delivery_signature_name]
       @service_type           = details[:service_type]
       @status                 = details[:status_description]
+      @status_code            = details[:status_code]
 
       if details.has_key?(:actual_delivery_timestamp)
         @delivery_at = Time.parse(details[:actual_delivery_timestamp])

@@ -62,6 +62,25 @@ module Fedex
           xml.LabelFormatType @label_specification[:label_format_type]
           xml.ImageType @label_specification[:image_type]
           xml.LabelStockType @label_specification[:label_stock_type]
+
+          if @label_specification[:printed_label_origin] && @label_specification[:printed_label_origin][:address]
+            xml.PrintedLabelOrigin {
+              xml.Contact {
+                xml.PersonName @label_specification[:printed_label_origin][:address][:name]
+                xml.CompanyName @label_specification[:printed_label_origin][:address][:company]
+                xml.PhoneNumber @label_specification[:printed_label_origin][:address][:phone_number]
+              }
+              xml.Address {
+                Array(@label_specification[:printed_label_origin][:address][:address]).each do |address_line|
+                  xml.StreetLines address_line
+                end
+                xml.City @label_specification[:printed_label_origin][:address][:city]
+                xml.StateOrProvinceCode @label_specification[:printed_label_origin][:address][:state]
+                xml.PostalCode @label_specification[:printed_label_origin][:address][:postal_code]
+                xml.CountryCode @label_specification[:printed_label_origin][:address][:country_code]
+              }
+            }
+          end
         }
       end
 

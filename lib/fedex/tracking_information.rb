@@ -44,7 +44,13 @@ module Fedex
         @delivery_at = Time.parse(details[:actual_delivery_timestamp])
       end
 
-      @events = details[:events].map do |event_details|
+      if details[:events].is_a?(Array)
+        events_details = details[:events]
+      else
+        events_details = [details[:events]]
+      end
+
+      @events = events_details.map do |event_details|
         Event.new(event_details)
       end
     end

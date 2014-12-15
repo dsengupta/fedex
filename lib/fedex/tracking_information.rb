@@ -32,6 +32,10 @@ module Fedex
                 :delivery_at, :events, :status_code
 
     def initialize(details = {})
+      if details.is_a?(Array)
+        details = details.first
+      end
+
       @details = details
 
       @tracking_number = details[:tracking_number]
